@@ -13,6 +13,7 @@ from texts import LANGUAGES, kind_label, t
 
 CACHE_TTL_SECONDS = 300
 FALLBACK_PATH = Path(__file__).parent / "data" / "fallback.json"
+ASSETS = Path(__file__).parent / "assets"
 
 st.set_page_config(page_title="Калькулятор вознаграждения", page_icon="🧮", layout="centered")
 log = logging.getLogger("app")
@@ -46,9 +47,23 @@ def rates_text(line: calc.Line, lang: str) -> str:
     return " / ".join([first, pct(line.rates[1]), pct(line.rates[2])])
 
 
+def load_styles() -> None:
+    """Подключает assets/style.css; без файла калькулятор работает в обычном виде."""
+    try:
+        css = (ASSETS / "style.css").read_text(encoding="utf-8")
+    except OSError:
+        return
+    st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
+
+
 # ---------------------------------------------------------------- страница
-lang_name = st.radio("Til / Язык", list(LANGUAGES.values()), horizontal=True,
-                     label_visibility="collapsed")
+load_styles()
+header_logo, header_lang = st.columns(2)
+if (ASSETS / "uztelecom-logo.png").exists():
+    header_logo.image(str(ASSETS / "uztelecom-logo.png"), width=160)
+with header_lang:
+    lang_name = st.radio("Til / Язык", list(LANGUAGES.values()), horizontal=True,
+                         label_visibility="collapsed")
 lang = next(code for code, name in LANGUAGES.items() if name == lang_name)
 
 try:
@@ -110,8 +125,8 @@ with summary:
 
 if result.lines:
     st.subheader(t(lang, "breakdown"))
-    for line in result.lines:
-        with st.container(border=True):
+    for i, line in enumerate(result.lines):
+        with st.container(key=f"line_{i}"):
             st.markdown(f"**{line.tariff}** × {line.quantity}")
             st.caption(rates_text(line, lang))
             rows = "\n".join(
