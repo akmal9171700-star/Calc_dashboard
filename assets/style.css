@@ -1,1 +1,63 @@
+/* Оформление калькулятора (подключается из app.py). Меняйте здесь цвета и размеры — Python трогать не нужно. */
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;800&display=swap');
 
+:root {
+  --brand: #3D6394;      /* цвет логотипа Uztelecom */
+  --ink: #14202E;
+  --muted: #5A6778;
+  --line: #E3E9F0;
+  --tint: #E8EFF8;
+  --bg: #F2F5F9;
+}
+
+html, body, .stApp, [data-testid="stAppViewContainer"] { background: var(--bg); }
+html, body, .stApp, p, label, h1, h2, h3, input, button, table { font-family: 'Manrope', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
+[data-testid="stHeader"] { display: none; }   /* прозрачная шапка Streamlit перекрывала кнопки языка */
+[data-testid="stMainBlockContainer"] { max-width: 480px; padding: 1.5rem 1rem 3rem; }
+[data-testid="stToolbar"] { display: none; }   /* меню Streamlit перекрывало переключатель языка */
+div[data-testid="stElementContainer"]:has(style) { display: none; }   /* пустое место от этого файла */
+
+/* Заголовки */
+h1 { font-size: 1.5rem !important; font-weight: 800 !important; letter-spacing: -0.01em; line-height: 1.2; padding: 0.25rem 0 0.5rem !important; color: var(--ink); }
+h3 { font-size: 1.15rem !important; font-weight: 800 !important; color: var(--ink); padding-bottom: 0.25rem !important; }
+[data-testid="stWidgetLabel"] p { font-size: 0.9rem; font-weight: 700; color: var(--ink); }
+[data-testid="stImage"] button, [data-testid="StyledFullScreenButton"] { display: none; }
+
+/* Логотип и язык в одной строке; месяцы остаются в три колонки и на телефоне */
+[data-testid="stHorizontalBlock"] { flex-wrap: nowrap !important; gap: 0.5rem; align-items: center; }
+[data-testid="stColumn"] { min-width: 0 !important; flex: 1 1 0 !important; width: auto !important; }
+
+/* Переключатели в виде сегментов */
+[data-testid="stElementContainer"]:has([data-testid="stRadio"]), [data-testid="stRadio"], [data-testid="stRadioGroup"] { width: 100% !important; }
+[data-testid="stRadioGroup"] { display: flex !important; flex-wrap: nowrap !important; gap: 4px; background: var(--tint); border-radius: 12px; padding: 4px; }
+[data-testid="stRadioGroup"] > div { flex: 1 1 0; min-width: 0; display: flex; }
+[data-testid="stRadioOption"] { flex: 1; display: flex; justify-content: center; align-items: center; min-height: 44px; margin: 0 !important; padding: 0 0.25rem; border-radius: 9px; cursor: pointer; }
+[data-testid="stRadioOption"] > div { display: flex; justify-content: center; align-items: center; }
+[data-testid="stRadioOption"] div:has(> div:empty) { display: none; }   /* кружок выбора */
+[data-testid="stRadioOption"] p { white-space: nowrap; font-size: 0.8rem; font-weight: 600; color: #2C3E55; text-align: center; margin: 0; }
+[data-testid="stRadioOption"][data-selected="true"], [data-testid="stRadioOption"]:has(input:checked) { background: var(--brand); }
+[data-testid="stRadioOption"][data-selected="true"] p, [data-testid="stRadioOption"]:has(input:checked) p { color: #fff; }
+
+/* Поля количества */
+[data-testid="stNumberInput"] [data-baseweb="input"] { border-radius: 12px; border: 1px solid #D3DCE7; background: #fff; overflow: hidden; }
+[data-testid="stNumberInput"] [data-baseweb="base-input"], [data-testid="stNumberInput"] input { background: #fff; }
+[data-testid="stNumberInput"] input { min-height: 44px; font-weight: 800; font-size: 1rem; }
+[data-testid="stNumberInput"] button { min-width: 44px; background: var(--bg); color: var(--brand); }
+
+/* Итог: крупная синяя карточка */
+[data-testid="stMetric"] { background: var(--brand); border-radius: 16px; padding: 18px; }
+[data-testid="stMetricLabel"], [data-testid="stMetricLabel"] * { color: #DCE7F5 !important; font-weight: 600; }
+[data-testid="stMetricValue"], [data-testid="stMetricValue"] * { color: #fff !important; font-size: 2.1rem !important; font-weight: 800 !important; letter-spacing: -0.02em; }
+/* Три месяца: белые карточки */
+[data-testid="stColumn"] [data-testid="stMetric"] { background: #fff; padding: 10px; box-shadow: 0 1px 2px rgba(20,32,46,.06), 0 4px 14px rgba(20,32,46,.05); }
+[data-testid="stColumn"] [data-testid="stMetricLabel"], [data-testid="stColumn"] [data-testid="stMetricLabel"] * { color: var(--muted) !important; font-size: 0.75rem; }
+[data-testid="stColumn"] [data-testid="stMetricValue"], [data-testid="stColumn"] [data-testid="stMetricValue"] * { color: var(--ink) !important; font-size: 0.8rem !important; letter-spacing: 0; white-space: nowrap; overflow: visible; text-overflow: clip; }
+
+/* Разбивка по тарифам */
+[class*="st-key-line_"] { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; gap: 0.4rem; }
+[data-testid="stMarkdownContainer"] table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+[data-testid="stMarkdownContainer"] th, [data-testid="stMarkdownContainer"] td { border: 0; border-bottom: 1px solid var(--line); padding: 0.35rem 0; background: transparent; }
+[data-testid="stMarkdownContainer"] th { color: var(--muted); font-weight: 600; font-size: 0.8rem; }
+[data-testid="stMarkdownContainer"] tr:last-child td { border-bottom: 0; }
+[data-testid="stCaptionContainer"], [data-testid="stCaptionContainer"] * { color: var(--muted) !important; opacity: 1; }
+[data-testid="stAlert"] { border-radius: 12px; }
