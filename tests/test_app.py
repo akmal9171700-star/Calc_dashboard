@@ -42,3 +42,22 @@ def test_uzbek_language_switch(app):
     app.radio[0].set_value("O'zbekcha").run()
     assert app.title[0].value == "Mukofot kalkulyatori"
     assert "so'm" in app.metric[0].value
+
+
+def test_design_files_are_shipped():
+    root = Path(APP).parent
+    assert (root / "assets" / "uztelecom-logo.png").stat().st_size > 1000
+    assert "#3D6394" in (root / "assets" / "style.css").read_text(encoding="utf-8")
+
+
+def test_app_works_without_style_file(monkeypatch):
+    real = Path.read_text
+
+    def fake(self, *args, **kwargs):
+        if self.name == "style.css":
+            raise FileNotFoundError(self)
+        return real(self, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", fake)
+    page = AppTest.from_file(APP, default_timeout=30).run()
+    assert not page.exception and page.metric
