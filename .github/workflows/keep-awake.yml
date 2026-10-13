@@ -1,1 +1,40 @@
+name: Keep calculator awake
 
+on:
+  schedule:
+    - cron: "17 * * * *"      # каждый час (17-я минута, чтобы не попадать в час пик GitHub)
+  workflow_dispatch:           # ручной запуск кнопкой Run workflow
+
+permissions:
+  actions: write      # нужно, чтобы расписание само себя поддерживало (первый шаг ниже)
+  contents: read
+
+jobs:
+  open-app:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      # GitHub отключает расписание в репозитории без активности 60 дней.
+      # Повторное «включение» через API сбрасывает этот счётчик (ошибка шага не мешает проверке приложения).
+      - name: Keep this schedule alive
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          curl --fail-with-body -sS -X PUT \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/keep-awake.yml/enable"
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install browser
+        run: |
+          python -m pip install --upgrade pip
+          pip install playwright
+          playwright install --with-deps chromium
+      - name: Open the app
+        env:
+          APP_URL: ${{ vars.APP_URL }}
+        run: python tools/keep_awake.py
