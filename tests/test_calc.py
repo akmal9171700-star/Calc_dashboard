@@ -40,10 +40,19 @@ def test_per_sim_top_sheet_salom_pro(rules):
     assert res.total == 128_572            # сумма округлённых месяцев
 
 
+# ---- скриншоты работающего приложения (1-я категория, МБР, 50 Salom Pro + 50 Bonus) ----
+def test_first_category_matches_live_app_screenshots(rules):
+    q = {"Salom Pro": 50, "Bonus Salom Pro": 50}
+    no = run(rules, q, category="L1", region="MBR", plan_met=False)
+    yes = run(rules, q, category="L1", region="MBR", plan_met=True)
+    assert no.month_totals == (2_207_143, 3_214_286, 0) and no.total == 5_421_429
+    assert yes.month_totals == (2_742_857, 4_642_857, 3_571_429) and yes.total == 10_957_143
+
+
 # ---- категории, регионы, план ----------------------------------------------
 @pytest.mark.parametrize("category,expected", [
     ("TOP", (46_429, 46_429, 35_714)),     # 65 / 65 / 50
-    ("L1", (42_857, 46_429, 0)),           # 60 / 65 / —
+    ("L1", (42_857, 46_429, 35_714)),      # 60 / 65 / 50 (3-й месяц — только Salom Pro)
     ("L2", (42_857, 42_857, 0)),           # 60 / 60 / —
 ])
 def test_plan_met_rates_by_category(rules, category, expected):
@@ -139,7 +148,7 @@ def _reference(category, region, plan_met, qty):
               "Salom Pro": 80000, "Ideal Plus": 85000, "Mobile Lux": 101000, "Mobile Elite": 150000}
     bundle = {"Salom Pro", "Ideal Plus", "Mobile Lux", "Mobile Elite"}
     if plan_met:
-        bundle_rates = {"TOP": (65, 65, 50), "L1": (60, 65, 0), "L2": (60, 60, 0)}[category]
+        bundle_rates = {"TOP": (65, 65, 50), "L1": (60, 65, 50), "L2": (60, 60, 0)}[category]
     else:
         bundle_rates = {"MBR": (45, 45, 0), "M": (55, 55, 0)}[region]
     region_rates = {"MBR": (45, 45, 0), "M": (55, 55, 0)}[region]
